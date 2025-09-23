@@ -11,6 +11,6 @@ class Elpl < Formula
   end
 
   test do
-    system "#{bin}/elpl", "--v"
+    system "#{bin}/elpl", "--version"
   end
 end
