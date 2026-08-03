@@ -13,10 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up GraalVM
+      - name: Set up GraalVM Community
         uses: graalvm/setup-graalvm@v1
         with:
-          version: '17'
+          java-version: '17'
           distribution: 'graalvm'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
