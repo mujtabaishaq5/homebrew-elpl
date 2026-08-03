@@ -3,7 +3,7 @@ class Elpl < Formula
   homepage "https://github.com/mujtabaishaq5/homebrew-elpl"
   url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL.zip"
   version "7.1.3"
-  sha256 "0e45a761fe790a2f3960291a3515fb3acb4a911e6f46381ddb918aeed368c6f2"
+  sha256 "bca9816b0dc666433e71a350d083ff9deb42eb3f850ae314bf73301b90ac0405"
   license "MIT"
 
   def install
