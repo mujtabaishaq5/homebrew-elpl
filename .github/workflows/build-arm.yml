@@ -1,6 +1,7 @@
 name: Build macOS Arm64 Binary
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'programminglanguage'
