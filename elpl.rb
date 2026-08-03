@@ -8,7 +8,7 @@ class Elpl < Formula
     if Hardware::CPU.arm?
       # Apple Silicon (Built via GitHub Actions)
       url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-arm64.zip"
-      sha256 "PASTE_ARM64_HASH_HERE"
+      sha256 "f32e07c54db9c20260e07648f2ed1809a2a21b57196fc3a541c563dd0252e0e1"
     else
       # Intel Mac (Built locally on your 2018 MacBook Pro)
       url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-intel64.zip"
