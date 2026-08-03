@@ -11,7 +11,7 @@ class Elpl < Formula
       sha256 "PASTE_ARM64_HASH_HERE"
     else
       # Intel Mac (Built locally on your 2018 MacBook Pro)
-      url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPLN.zip"
+      url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-intel64.zip"
       sha256 "85726cff4545e5f89336f552d4cc5ab00dd11577ddf45a7c9d1bbdd95e4c8364"
     end
   elsif OS.linux?
