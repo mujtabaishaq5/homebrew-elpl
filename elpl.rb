@@ -17,7 +17,7 @@ class Elpl < Formula
   elsif OS.linux?
     # Linux x64 (Built via Docker)
     url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-linux-x64.tar.gz"
-    sha256 "PASTE_LINUX_HASH_HERE"
+    sha256 "bf4301b9eba2e6a9fbdc3beb3aa927a159b1321c95b768eecb3ff169948f53e7"
   end
 
   def install
