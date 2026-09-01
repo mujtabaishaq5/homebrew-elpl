@@ -12,6 +12,7 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos-14
@@ -34,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -54,22 +55,28 @@ jobs:
           jar uf elplc.jar -C "$TEMP_ASM" .
           rm -rf "$TEMP_ASM"
 
-      - name: Compile C Launcher (macOS & Linux)
-        if: runner.os != 'Windows'
+      - name: Compile C Launcher (Linux)
+        if: matrix.target == 'linux-x64'
         run: |
-          OS_INCLUDE="darwin"
-          if [ "${{ matrix.target }}" == "linux-x64" ]; then
-            OS_INCLUDE="linux"
-          fi
+          gcc elpl_launcher.c -o elpl \
+            -I"$JAVA_HOME/include" \
+            -I"$JAVA_HOME/include/linux" \
+            -L"$JAVA_HOME/lib/server" \
+            -ljvm \
+            -Wl,-rpath,"$JAVA_HOME/lib/server"
+
+      - name: Compile C Launcher (macOS)
+        if: startsWith(matrix.target, 'mac')
+        run: |
           clang elpl_launcher.c -o elpl \
             -I"$JAVA_HOME/include" \
-            -I"$JAVA_HOME/include/$OS_INCLUDE" \
+            -I"$JAVA_HOME/include/darwin" \
             -L"$JAVA_HOME/lib/server" \
             -ljvm \
             -Wl,-rpath,"$JAVA_HOME/lib/server"
 
       - name: Compile C Launcher (Windows)
-        if: runner.os == 'Windows'
+        if: matrix.target == 'windows-x64'
         shell: bash
         run: |
           gcc elpl_launcher.c -o elpl.exe \
@@ -85,7 +92,7 @@ jobs:
           mkdir -p dist/bin dist/lib/elplc
           cp ${{ matrix.binary }} dist/bin/${{ matrix.binary }}
           cp elplc.jar dist/lib/elplc/elplc.jar
-          if [ "${{ runner.os }}" != 'Windows' ]; then
+          if [ "${{ matrix.target }}" != 'windows-x64' ]; then
             chmod +x dist/bin/${{ matrix.binary }}
           fi
           cd dist && zip -r ../${{ matrix.archive }} bin lib
