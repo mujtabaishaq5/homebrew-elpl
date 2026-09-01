@@ -10,7 +10,7 @@ class Elpl < Formula
       sha256 "fd9282b81b0a07f8814b45c999c9086c55a2de2c97b915dc44348a78af7a5a31"
     else
       url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-intel64.zip"
-      sha256 "UPDATE_AFTER_RELEASE"
+      sha256 "2dd1cf99e62bc82f2a5740a58e100d7d73845998f7d56e99efe565796a78f504"
     end
   elsif OS.linux?
     url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-linux-x64.tar.gz"
