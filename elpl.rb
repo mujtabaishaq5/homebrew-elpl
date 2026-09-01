@@ -1,8 +1,9 @@
 class Elpl < Formula
   desc "ELPL programming language"
   homepage "https://github.com/mujtabaishaq5/homebrew-elpl"
-  version "7.1.3"
+  version "7.4.2"
   license "MIT"
+  depends_on "openjdk@17"
 
   if OS.mac?
     if Hardware::CPU.arm?
@@ -15,13 +16,14 @@ class Elpl < Formula
       sha256 "5f6703bde2885f32e78749e5eab930702dccb9be8382ab0370f827e68239c298"
     end
   elsif OS.linux?
-    # Linux x64 (Built via Docker)
+    # Linux x64
     url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-linux-x64.tar.gz"
     sha256 "e892b000a0f46d4f0e6356eb317588289f3c51e041cf18d30563c54424702606"
   end
 
   def install
-    bin.install "elpl"
+    bin.install "bin/elpl"
+    (lib/"elplc").install "lib/elplc/elplc.jar"
   end
 
   test do
