@@ -38,7 +38,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'graalvm'
-          java-version: 'JDK 17'
+          java-version: '17'
 
       - name: Build Fat JAR with ASM
         shell: bash
