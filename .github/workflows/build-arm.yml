@@ -73,15 +73,23 @@ jobs:
             -L"$JAVA_HOME/lib/server" \
             -ljvm
 
-      - name: Package into Archive
+      - name: Package into Archive (Windows)
+        if: matrix.target == 'windows-x64'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path "dist/bin", "dist/lib/elplc"
+          Copy-Item "${{ matrix.binary }}" -Destination "dist/bin/${{ matrix.binary }}"
+          Copy-Item "elplc.jar" -Destination "dist/lib/elplc/elplc.jar"
+          Compress-Archive -Path "dist/*" -DestinationPath "${{ matrix.archive }}" -Force
+
+      - name: Package into Archive (Unix)
+        if: matrix.target != 'windows-x64'
         shell: bash
         run: |
           mkdir -p dist/bin dist/lib/elplc
           cp ${{ matrix.binary }} dist/bin/${{ matrix.binary }}
           cp elplc.jar dist/lib/elplc/elplc.jar
-          if [ "${{ matrix.target }}" != 'windows-x64' ]; then
-            chmod +x dist/bin/${{ matrix.binary }}
-          fi
+          chmod +x dist/bin/${{ matrix.binary }}
           cd dist
           if [[ "${{ matrix.archive }}" == *.zip ]]; then
             zip -r ../${{ matrix.archive }} bin lib
