@@ -37,7 +37,7 @@ jobs:
       - name: Set up GraalVM
         uses: actions/setup-java@v5
         with:
-          distribution: 'graalvm'
+          distribution: 'graalvm-community'
           java-version: '17'
 
       - name: Build Fat JAR with ASM
