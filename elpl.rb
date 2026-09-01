@@ -14,7 +14,7 @@ class Elpl < Formula
     end
   elsif OS.linux?
     url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-linux-x64.tar.gz"
-    sha256 "UPDATE_AFTER_RELEASE"
+    sha256 "58aecbfd5e9c3345ce1d69a7b0a99f3aa6e213453677bd419cfc02f90f17b5bc"
   end
 
   def install
