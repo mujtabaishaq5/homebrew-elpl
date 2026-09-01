@@ -42,7 +42,7 @@ jobs:
 
       - name: Set up MSVC Environment (Windows)
         if: matrix.target == 'windows-x64'
-        uses: ilammy/msvc-dev-cmd@v13
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Verify elpl.jar Exists
         shell: bash
