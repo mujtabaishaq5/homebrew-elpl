@@ -40,6 +40,10 @@ jobs:
           distribution: 'graalvm-community'
           java-version: '17'
 
+      - name: Set up MSVC Environment (Windows)
+        if: matrix.target == 'windows-x64'
+        uses: ilammy/msvc-dev-cmd@v13
+
       - name: Verify elpl.jar Exists
         shell: bash
         run: |
