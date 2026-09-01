@@ -44,13 +44,16 @@ jobs:
         shell: bash
         run: |
           mkdir -p out
-          javac -cp "lib/asm-9.7.1.jar:lib/asm-tree-9.7.jar" -d out syed/*.java
+          find syed -name "*.java" > sources.txt
+          javac -cp "lib/asm-9.7.1.jar:lib/asm-tree-9.7.jar" -d out @sources.txt
+          rm sources.txt
+          
           jar cfm elplc.jar MANIFEST.MF -C out .
           
           TEMP_ASM=$(mktemp -d)
           jar xf lib/asm-9.7.1.jar -C "$TEMP_ASM"
           jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM" 2>/dev/null || true
-          jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM"
+          jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM" 2>/dev/null || true
           rm -rf "$TEMP_ASM/META-INF"
           jar uf elplc.jar -C "$TEMP_ASM" .
           rm -rf "$TEMP_ASM"
