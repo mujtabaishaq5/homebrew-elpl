@@ -8,7 +8,7 @@ class Elpl < Formula
   if OS.mac?
     if Hardware::CPU.arm?
       url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-arm64.zip"
-      sha256 "UPDATE_AFTER_RELEASE"
+      sha256 "97c23e03158dd25530da2623e2d943c8ac1045d1b7c36b1de18c38dcb0884742"
     else
       url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-intel64.zip"
       sha256 "UPDATE_AFTER_RELEASE"
