@@ -52,7 +52,11 @@ jobs:
       - name: Build Native Image
         shell: bash
         run: |
-          native-image --no-fallback -jar elpl.jar ${{ matrix.binary }}
+          if [ "${{ matrix.target }}" == "windows-x64" ]; then
+            native-image.cmd --no-fallback -jar elpl.jar ${{ matrix.binary }}
+          else
+            native-image --no-fallback -jar elpl.jar ${{ matrix.binary }}
+          fi
 
       - name: Package into Archive
         shell: bash
