@@ -62,16 +62,21 @@ jobs:
             native-image --no-fallback -jar elpl.jar ${{ matrix.binary }}
           fi
 
-      - name: Package into Archive
+      - name: Package into Archive (Windows)
+        if: matrix.target == 'windows-x64'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path "dist/bin"
+          Copy-Item "${{ matrix.binary }}.exe" -Destination "dist/bin/${{ matrix.binary }}.exe"
+          Compress-Archive -Path "dist/*" -DestinationPath "${{ matrix.archive }}" -Force
+
+      - name: Package into Archive (Unix)
+        if: matrix.target != 'windows-x64'
         shell: bash
         run: |
           mkdir -p dist/bin
-          if [ "${{ matrix.target }}" == 'windows-x64' ]; then
-            cp ${{ matrix.binary }}.exe dist/bin/${{ matrix.binary }}.exe
-          else
-            cp ${{ matrix.binary }} dist/bin/${{ matrix.binary }}
-            chmod +x dist/bin/${{ matrix.binary }}
-          fi
+          cp ${{ matrix.binary }} dist/bin/${{ matrix.binary }}
+          chmod +x dist/bin/${{ matrix.binary }}
           cd dist
           if [[ "${{ matrix.archive }}" == *.zip ]]; then
             zip -r ../${{ matrix.archive }} bin
