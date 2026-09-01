@@ -1,4 +1,4 @@
-name: Build ELPL SDK Binaries
+name: Build Native ELPL Binaries
 
 on:
   workflow_dispatch:
@@ -34,67 +34,48 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up GraalVM
         uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
+          distribution: 'graalvm'
           java-version: '17'
 
-      - name: Compile C Launcher (Linux)
-        if: matrix.target == 'linux-x64'
+      - name: Build Fat JAR with ASM
         shell: bash
         run: |
-          gcc elpl_launcher.c -o elpl \
-            -I"$JAVA_HOME/include" \
-            -I"$JAVA_HOME/include/linux" \
-            -L"$JAVA_HOME/lib/server" \
-            -ljvm \
-            -Wl,-rpath,"$JAVA_HOME/lib/server"
+          mkdir -p out
+          find . -name "*.java" > sources.txt
+          javac -cp "lib/asm-9.7.1.jar:lib/asm-tree-9.7.jar" -d out @sources.txt
+          rm sources.txt
+          
+          jar cfm elpl.jar MANIFEST.MF -C out .
+          
+          TEMP_ASM=$(mktemp -d)
+          jar xf lib/asm-9.7.1.jar -C "$TEMP_ASM"
+          jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM" 2>/dev/null || true
+          jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM" 2>/dev/null || true
+          rm -rf "$TEMP_ASM/META-INF"
+          jar uf elpl.jar -C "$TEMP_ASM" .
+          rm -rf "$TEMP_ASM"
 
-      - name: Compile C Launcher (macOS)
-        if: startsWith(matrix.target, 'mac')
+      - name: Build Native Image
         shell: bash
         run: |
-          clang elpl_launcher.c -o elpl \
-            -I"$JAVA_HOME/include" \
-            -I"$JAVA_HOME/include/darwin" \
-            -L"$JAVA_HOME/lib/server" \
-            -ljvm \
-            -Wl,-rpath,"$JAVA_HOME/lib/server"
+          native-image --no-fallback -jar elpl.jar ${{ matrix.binary }}
 
-      - name: Compile C Launcher (Windows)
-        if: matrix.target == 'windows-x64'
+      - name: Package into Archive
         shell: bash
         run: |
-          gcc elpl_launcher.c -o elpl.exe \
-            -I"$JAVA_HOME/include" \
-            -I"$JAVA_HOME/include/win32" \
-            -L"$JAVA_HOME/lib" \
-            -L"$JAVA_HOME/lib/server" \
-            -ljvm
-
-      - name: Package into Archive (Windows)
-        if: matrix.target == 'windows-x64'
-        shell: powershell
-        run: |
-          New-Item -ItemType Directory -Force -Path "dist/bin", "dist/lib/elplc"
-          Copy-Item "${{ matrix.binary }}" -Destination "dist/bin/${{ matrix.binary }}"
-          Copy-Item "elplc.jar" -Destination "dist/lib/elplc/elplc.jar"
-          Compress-Archive -Path "dist/*" -DestinationPath "${{ matrix.archive }}" -Force
-
-      - name: Package into Archive (Unix)
-        if: matrix.target != 'windows-x64'
-        shell: bash
-        run: |
-          mkdir -p dist/bin dist/lib/elplc
+          mkdir -p dist/bin
           cp ${{ matrix.binary }} dist/bin/${{ matrix.binary }}
-          cp elplc.jar dist/lib/elplc/elplc.jar
-          chmod +x dist/bin/${{ matrix.binary }}
+          if [ "${{ matrix.target }}" != 'windows-x64' ]; then
+            chmod +x dist/bin/${{ matrix.binary }}
+          fi
           cd dist
           if [[ "${{ matrix.archive }}" == *.zip ]]; then
-            zip -r ../${{ matrix.archive }} bin lib
+            zip -r ../${{ matrix.archive }} bin
           else
-            tar -czf ../${{ matrix.archive }} bin lib
+            tar -czf ../${{ matrix.archive }} bin
           fi
 
       - name: Upload to Release
