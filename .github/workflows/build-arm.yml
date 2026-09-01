@@ -1,4 +1,4 @@
-name: Build macOS Arm64 Binary
+name: Build ELPL SDK Binaries
 
 on:
   workflow_dispatch:
@@ -7,35 +7,93 @@ on:
       - 'programminglanguage'
 
 permissions:
-  contents: write  # <-- This gives the token permission to upload to releases
+  contents: write
 
 jobs:
-  build-arm:
-    runs-on: macos-14
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-14
+            target: mac-arm64
+            archive: ELPL-mac-arm64.zip
+            binary: elpl
+          - os: ubuntu-latest
+            target: linux-x64
+            archive: elpl-linux-x64.zip
+            binary: elpl
+          - os: windows-latest
+            target: windows-x64
+            archive: ELPL-windows-x64.zip
+            binary: elpl.exe
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up GraalVM Community
-        uses: graalvm/setup-graalvm@v1
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
+          distribution: 'temurin'
           java-version: '17'
-          distribution: 'graalvm'
-          components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Native Image from repo jar
+      - name: Build Fat JAR with ASM
+        shell: bash
         run: |
-          native-image -jar elpl.jar elpl
+          mkdir -p out
+          javac -cp "lib/asm-9.7.1.jar:lib/asm-tree-9.7.jar" -d out syed/*.java
+          jar cfm elplc.jar MANIFEST.MF -C out .
+          
+          TEMP_ASM=$(mktemp -d)
+          jar xf lib/asm-9.7.1.jar -C "$TEMP_ASM"
+          jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM" 2>/dev/null || true
+          jar xf lib/asm-tree-9.7.jar -C "$TEMP_ASM"
+          rm -rf "$TEMP_ASM/META-INF"
+          jar uf elplc.jar -C "$TEMP_ASM" .
+          rm -rf "$TEMP_ASM"
+
+      - name: Compile C Launcher (macOS & Linux)
+        if: runner.os != 'Windows'
+        run: |
+          OS_INCLUDE="darwin"
+          if [ "${{ matrix.target }}" == "linux-x64" ]; then
+            OS_INCLUDE="linux"
+          fi
+          clang elpl_launcher.c -o elpl \
+            -I"$JAVA_HOME/include" \
+            -I"$JAVA_HOME/include/$OS_INCLUDE" \
+            -L"$JAVA_HOME/lib/server" \
+            -ljvm \
+            -Wl,-rpath,"$JAVA_HOME/lib/server"
+
+      - name: Compile C Launcher (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          gcc elpl_launcher.c -o elpl.exe \
+            -I"$JAVA_HOME/include" \
+            -I"$JAVA_HOME/include/win32" \
+            -L"$JAVA_HOME/lib" \
+            -L"$JAVA_HOME/lib/server" \
+            -ljvm
 
       - name: Package into ZIP
+        shell: bash
         run: |
-          zip ELPL-mac-arm64.zip elpl
+          mkdir -p dist/bin dist/lib/elplc
+          cp ${{ matrix.binary }} dist/bin/${{ matrix.binary }}
+          cp elplc.jar dist/lib/elplc/elplc.jar
+          if [ "${{ runner.os }}" != 'Windows' ]; then
+            chmod +x dist/bin/${{ matrix.binary }}
+          fi
+          cd dist && zip -r ../${{ matrix.archive }} bin lib
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ELPL-mac-arm64.zip
+          files: ${{ matrix.archive }}
           tag_name: programminglanguage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
