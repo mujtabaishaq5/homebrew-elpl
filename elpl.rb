@@ -2,7 +2,7 @@ class Elpl < Formula
   desc "ELPL programming language compiler"
   homepage "https://github.com/mujtabaishaq5/ELPL-Official/"
   url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-compiler-v7.5.9.zip"
-  sha256 "ad6350200ab1be45ffdac72b9532e1bb26b699e9fc0eb732b744a4db24d8cb12"
+  sha256 "2a35b7afe063d5d40e0f22addf705dabacbbd0b8a0dc891cf069ed3a57a6e34d"
   license "MIT"
 
   # Automatically ensures Java 17+ is installed for the JVM wrapper
