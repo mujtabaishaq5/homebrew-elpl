@@ -1,27 +1,23 @@
 class Elpl < Formula
-  desc "ELPL programming language"
-  homepage "https://github.com/mujtabaishaq5/homebrew-elpl"
-  version "7.4.2"
+  desc "ELPL programming language compiler"
+  homepage "https://github.com/mujtabaishaq5/ELPL-Official/"
+  url "https://elpl-d8625.web.app/elpl-compiler-v7.5.9.zip"
+  sha256 "ad6350200ab1be45ffdac72b9532e1bb26b699e9fc0eb732b744a4db24d8cb12"
   license "MIT"
 
-  if OS.mac?
-    if Hardware::CPU.arm?
-      url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-arm64.zip"
-      sha256 "4bf93d7686d53fcf6ca1b2cb9b9f611a570ccaf2f6962efbad1cf1e0f59f4bbb"
-    else
-      url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/ELPL-mac-intel64.zip"
-      sha256 "2dd1cf99e62bc82f2a5740a58e100d7d73845998f7d56e99efe565796a78f504"
-    end
-  elsif OS.linux?
-    url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-linux-x64.tar.gz"
-    sha256 "0eb848e3500da657ec68407393122295c1cd710d5ed154c25dd3e3a86b431be4"
-  end
+  # Automatically ensures Java 17+ is installed for the JVM wrapper
+  depends_on "openjdk"
 
   def install
-    bin.install "elpl"
+    # Installs the bin and lib directories into Homebrew's private libexec
+    libexec.install "bin", "lib"
+
+    # Symlinks your 'elplc' wrapper script into the global system path
+    bin.install_symlink libexec/"bin/elplc"
   end
 
   test do
-    system "#{bin}/elpl", "--v"
+    # Validates that the compiler command executes successfully
+    assert_match "ELPL version", shell_output("#{bin}/elplc --v")
   end
 end
