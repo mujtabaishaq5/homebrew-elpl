@@ -1,0 +1,44 @@
+#!/bin/sh
+# Resolve absolute path of the script, even when invoked via PATH
+PRG="${BASH_SOURCE[0]:-$0}"
+case "$PRG" in
+    */*) ;;
+    *) PRG=$(which "$PRG" 2>/dev/null || echo "$PRG") ;;
+esac
+
+while [ -h "$PRG" ]; do
+    ls=$(ls -ld "$PRG")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
+    if expr "$link" : '/.*' > /dev/null; then
+        PRG="$link"
+    else
+        PRG=$(dirname "$PRG")/"$link"
+    fi
+done
+
+BIN_DIR=$(cd -P "$(dirname "$PRG")" && pwd)
+ELPL_HOME=$(cd "$BIN_DIR/.." >/dev/null && pwd)
+
+# Locate Java executable
+if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    JAVA="$JAVA_HOME/bin/java"
+else
+    JAVA="java"
+    if ! command -v java &> /dev/null; then
+        echo "Error: Java runtime environment not found. Please install Java 17 or higher." >&2
+        exit 1
+    fi
+fi
+
+# Construct the classpath dynamically from the lib/ folder
+CP="$ELPL_HOME/lib/elpl-compiler.jar"
+if [ -d "$ELPL_HOME/lib" ]; then
+    for jar in "$ELPL_HOME/lib"/*.jar; do
+        if [ -f "$jar" ] && [ "$jar" != "$CP" ]; then
+            CP="$CP:$jar"
+        fi
+    done
+fi
+
+# Execute your Main class invisibly, preserving all CLI arguments
+exec "$JAVA" -cp "$CP" syed.Main "$@"
