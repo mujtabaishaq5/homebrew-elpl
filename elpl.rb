@@ -5,9 +5,6 @@ class Elpl < Formula
   sha256 "2a35b7afe063d5d40e0f22addf705dabacbbd0b8a0dc891cf069ed3a57a6e34d"
   license "MIT"
 
-  # Automatically ensures Java 17+ is installed for the JVM wrapper
-  depends_on "openjdk"
-
   def install
     # Installs the bin and lib directories into Homebrew's private libexec
     libexec.install "bin", "lib"
