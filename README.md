@@ -7,7 +7,7 @@ elpl package
 `brew install elpl`
 
 # 3. Verify
-`elpl --v`
+`elplc --v`
 ```elpl
 print "Hello world"
 
