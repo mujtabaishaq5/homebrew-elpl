@@ -1,7 +1,7 @@
 class Elpl < Formula
   desc "ELPL programming language compiler"
   homepage "https://github.com/mujtabaishaq5/ELPL-Official/"
-  url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-compiler-v7.6.0.zip"
+  url "https://github.com/mujtabaishaq5/homebrew-elpl/releases/download/programminglanguage/elpl-compiler-v7.7.1.zip"
   sha256 "af8769b8ab13dfe0d92606fc4e7c010e7614ca520605d6ea4213824880dd79db"
   license "MIT"
 
